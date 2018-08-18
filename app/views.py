@@ -1,5 +1,6 @@
 from flask import request, make_response, jsonify
 from app.model.user import User
+from app.model.request import Request
 from app.application import Application
 from . import app
 
@@ -58,3 +59,42 @@ def login():
         'message': 'succefully logged in',
         'token': token
     })), 200
+
+
+@app.route('/users/requests', methods=['POST'])
+def create_request():
+    """
+    Move the methods below to a decorator to avoid code duplication
+    :return:
+    """
+    if request.content_type != 'application/json':
+        return make_response(jsonify({
+            "message": "Please use json as content type"
+        })), 400
+
+    if 'Authorization' not in request.headers:
+        return make_response(jsonify({
+            'message': "Token missing"
+        })), 400
+
+    try:
+        token = request.headers['Authorization'].split(" ")[1]
+    except IndexError:
+        return make_response(jsonify({
+            "message": "token is missing"
+        })), 400
+
+    if isinstance(User.decode(token), str):
+        return make_response(jsonify({
+            'message': User.decode(token)
+        })), 400
+
+    email = User.decode(token)['email']
+    data = request.get_json()
+    name = data.get('name')
+    req = Request(application.generate_random_key(), name, email)
+    application.add_request(req)
+    return make_response(jsonify({
+        'message': 'request added successfully',
+        'request': req.get_dict()
+    })), 201

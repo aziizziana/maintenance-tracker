@@ -24,10 +24,9 @@ class User:
     @staticmethod
     def decode(token):
         try:
-            payload = jwt.decode(token, get_env['APP_SECRET'], algorithms='HS256')
-            return payload['email']
+            payload = jwt.decode(token, get_env('APP_SECRET'), algorithms='HS256')
+            return payload
         except jwt.ExpiredSignatureError:
             return 'Signature expired, Please sign in again'
         except jwt.InvalidTokenError:
             return 'Invalid token. Please sign in again'
-

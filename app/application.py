@@ -1,5 +1,10 @@
+import random
+import string
+
+
 class Application:
     users = {}
+    requests = []
 
     def register(self, user):
         self.users[user.email] = user
@@ -16,3 +21,10 @@ class Application:
 
     def get_user(self, email):
         return self.users[email]
+
+    def add_request(self, request):
+        self.requests.append(request.get_dict())
+
+    @staticmethod
+    def generate_random_key():
+        return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(10))
